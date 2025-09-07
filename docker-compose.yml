@@ -1,0 +1,74 @@
+version: '3.9'
+services:
+  nginx:
+    container_name: nginx
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.dev
+    ports:
+      - '3000:80'
+    depends_on:
+      - api
+      - client
+  api:
+    container_name: node_api
+    restart: on-failure
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    # ports:
+    #   - '4001:5000'
+    volumes:
+      - /usr/app/node_modules
+      - ./server:/usr/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=pwd
+      - PGPORT=5432
+    depends_on:
+      - redis
+      - postgres
+  worker:
+    container_name: worker
+    restart: on-failure
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /usr/app/node_modules
+      - ./worker:/usr/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+  client:
+    container_name: client
+    restart: always
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    # ports:
+    #   - '3000:3000'
+    volumes:
+      - /usr/app/node_modules
+      - ./client:/usr/app
+  redis:
+    container_name: redis_server
+    image: redis:8
+    restart: always
+    # ports:
+    #   - '6379:6379'
+  postgres:
+    container_name: postgres_db
+    image: postgres:17
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=pwd
+    # ports:
+    #   - '5432:5432'
