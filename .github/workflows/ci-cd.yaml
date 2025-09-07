@@ -22,7 +22,7 @@ jobs:
         run: docker build -t tony5244/docker-multi-react-test -f ./client/Dockerfile.dev ./client
 
       - name: Run tests
-        run: docker run --rm -e CI=true tony5244/docker-multi-react-test npm test
+        run: docker run -e CI=true tony5244/docker-multi-react-test npm test
 
   build:
     runs-on: ubuntu-latest
