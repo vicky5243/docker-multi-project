@@ -44,3 +44,15 @@ jobs:
           docker build -t tony5244/multi-nginx-2 ./nginx
           docker build -t tony5244/multi-server-2 ./server
           docker build -t tony5244/multi-worker-2 ./worker
+
+      - name: Push Docker images
+        run: |
+          docker push tony5244/multi-client-2
+          docker push tony5244/multi-nginx-2
+          docker push tony5244/multi-server-2
+          docker push tony5244/multi-worker-2
+
+      - name: Create deployment package
+        run: |
+          zip -r ${{ env.DEPLOY_PACKAGE }} . \
+          -x "*.git*" "node_modules/*" "tests/*" "*.md"
